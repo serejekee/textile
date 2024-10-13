@@ -75,8 +75,6 @@ function startScript() {
   for (var key in data) {
     dataText += 'Coloană ' + targetSheet.getRange(1, key).getA1Notation() + ': ' + data[key] + '\n';
   }
-
-  // Добавляем отображение данных в алерте
   var dataResponse = ui.alert('Date:\n' + dataText, ui.ButtonSet.OK_CANCEL);
   
   if (dataResponse == ui.Button.CANCEL) {
