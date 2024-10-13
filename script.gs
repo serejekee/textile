@@ -14,11 +14,13 @@ function startScript() {
     ui.alert('Operația a fost anulată.');
     return;
   }
+  
   var rowNum = parseInt(response.getResponseText());
   if (isNaN(rowNum) || rowNum < 1) {
     ui.alert('Număr de linie nevalid.');
     return;
   }
+  
   var id = sheet.getRange(rowNum, 2).getValue();
   var valueG = sheet.getRange(rowNum, 7).getValue();
 
@@ -26,8 +28,9 @@ function startScript() {
     ui.alert('Date nu au fost găsite.');
     return;
   }
-  var targetSpreadsheet = SpreadsheetApp.openById('ID Таблицы');
-  var targetSheet = targetSpreadsheet.getSheetByName('Имя листа');
+  
+  var targetSpreadsheet = SpreadsheetApp.openById('ID table');
+  var targetSheet = targetSpreadsheet.getSheetByName('list name');
   var targetRange = targetSheet.getRange('A:A');
   var values = targetRange.getValues();
   
@@ -43,8 +46,7 @@ function startScript() {
     ui.alert('ID-ul nu a fost găsit în foaia țintă.');
     return;
   }
-
-  // Колонки, из которых нужно получить данные (D, G, J, M, P, S, V, Y, AB, AE)
+  
   var columns = [4, 7, 10, 13, 16, 19, 22, 25, 28, 31];
   var data = {};
   
@@ -60,11 +62,11 @@ function startScript() {
         additionalValues.push(additionalCellValue);
       }
     }
-    
     if (additionalValues.length > 0) {
       data[columns[i]] += ' (' + additionalValues.join(', ') + ')';
     }
   }
+  
   if (Object.keys(data).length === 0) {
     ui.alert('Nu s-au găsit date pentru ID-ul specificat.');
     return;
@@ -74,19 +76,21 @@ function startScript() {
     dataText += 'Coloană ' + targetSheet.getRange(1, key).getA1Notation() + ': ' + data[key] + '\n';
   }
 
+  // Добавляем отображение данных в алерте
   var dataResponse = ui.alert('Date:\n' + dataText, ui.ButtonSet.OK_CANCEL);
   
   if (dataResponse == ui.Button.CANCEL) {
     ui.alert('Operația a fost anulată.');
     return;
   }
+
   var columnResponse = ui.prompt('Introdu litera coloanei din care să scadă valoarea:', ui.ButtonSet.OK_CANCEL);
 
   if (columnResponse.getSelectedButton() == ui.Button.CANCEL) {
     ui.alert('Operația a fost anulată.');
     return;
   }
-
+  
   var columnLetter = columnResponse.getResponseText().toUpperCase();
   var columnIndex = getColumnIndex(columnLetter);
 
@@ -94,15 +98,16 @@ function startScript() {
     ui.alert('Coloană nevalidă.');
     return;
   }
-
+  
   var currentValue = targetSheet.getRange(foundRow, columnIndex).getValue();
-  if (typeof currentValue !== 'number') {
-    ui.alert('Valoarea din coloană nu este un număr.');
-    return;
+  var newValue = currentValue - valueG;
+  if (newValue === 0) {
+    targetSheet.getRange(foundRow, columnIndex).clearContent();
+    targetSheet.getRange(foundRow, columnIndex + 1).clearContent();
+    targetSheet.getRange(foundRow, columnIndex + 2).clearContent();
+  } else {
+    targetSheet.getRange(foundRow, columnIndex).setValue(newValue);
   }
-
-  var newValue = (currentValue - valueG).toFixed(2);
-  targetSheet.getRange(foundRow, columnIndex).setValue(newValue);
 
   ui.alert('Operația este finalizată. Noua valoare: ' + newValue);
 }
@@ -110,4 +115,3 @@ function startScript() {
 function getColumnIndex(columnLetter) {
   return columnLetter.charCodeAt(0) - 64;
 }
-
