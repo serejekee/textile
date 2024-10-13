@@ -27,8 +27,8 @@ function startScript() {
     ui.alert('Date nu au fost găsite.');
     return;
   }
-  var targetSpreadsheet = SpreadsheetApp.openById('1zmUOvDS-UEiJewNUHk-belj7R7scmaQkrdgT-PAo_II');
-  var targetSheet = targetSpreadsheet.getSheetByName('Draperii');
+  var targetSpreadsheet = SpreadsheetApp.openById('ID_Таблицы');
+  var targetSheet = targetSpreadsheet.getSheetByName('Лист');
   var targetRange = targetSheet.getRange('A:A');
   var values = targetRange.getValues();
   
